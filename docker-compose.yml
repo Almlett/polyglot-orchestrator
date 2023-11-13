@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  polyglot-orchestrator:
+    healthcheck: # Healthcheck to make sure the container is running
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"] 
+      interval: 30s # Check every 30 seconds
+      timeout: 10s # Timeout after 10 seconds
+      retries: 4 # Retry 4 times before marking unhealthy
+    logging: # Logging configuration
+      driver: json-file  # Log to JSON files
+      options: 
+        max-size: "200k" 
+        max-file: "10"
+    deploy: # Deployment configuration
+      resources: 
+        limits: # Limit the resources the container can use
+          cpus: "0.5" # Use no more than 50% of a CPU
+          memory: 50M # Use no more than 50MB of memory
+    container_name: polyglot-orchestrator # Name the container
+    build: . # Build from the Dockerfile in the current directory
+    ports:
+      - "8080:8080" # Map port 8080 on the host to port 8080 on the container
+    restart: always # Restart the container if it shuts down
+    networks:
+      - apinet # Connect the container to the apinet network
+
+# Define the apinet network that the container will connect to 
+networks:
+  apinet:
+    driver: bridge
+

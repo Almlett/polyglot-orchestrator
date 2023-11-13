@@ -1,0 +1,25 @@
+# Ignorar archivos y directorios de Git
+.git
+.gitignore
+
+# Ignorar archivos de configuración específicos del entorno
+.env
+.env.local
+
+# Ignorar directorios de salida de compilación
+/bin/
+/pkg/
+
+# Ignorar dependencias
+/vendor/
+
+# Ignorar archivos generados por el IDE
+.idea/
+*.swp
+*.swo
+
+# Ignorar archivos de estado del sistema
+.DS_Store
+
+# Ignorar carpetas de node
+node_modules/

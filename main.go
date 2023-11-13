@@ -1,14 +1,20 @@
 package main
 
 import (
-    "fmt"
+    "log"
     "net/http"
+    "github.com/gorilla/mux"
 )
 
 func main() {
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, "Hola API Gateway!")
-    })
+    r := mux.NewRouter()
+    r.HandleFunc("/", HomeHandler)
+    http.Handle("/", r)
 
-    http.ListenAndServe(":8080", nil)
+    log.Fatal(http.ListenAndServe(":8080", r))
+}
+
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Bienvenido al API Gateway"))
 }

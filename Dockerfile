@@ -1,4 +1,4 @@
-# Use golang 1.18 on Alpine Linux as the base image for the build stage
+# Use golang 1.19.8 on Alpine Linux as the base image for the build stage
 FROM golang:1.19.8-alpine AS builder
 
 # Install git, necessary for fetching Go dependencies
@@ -14,11 +14,12 @@ COPY go.sum .
 # Download the Go modules specified in go.mod and go.sum
 RUN go mod download
 
-# Copy all Go source files from the current directory into the container
-COPY *.go ./
+# Copy the entire directory (including subdirectories) into the container
+COPY . .
 
-# Build the application: disable CGO, set the target OS to Linux, compile for all dependencies, and output the binary named 'main'
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# Build the application: disable CGO, set the target OS to Linux, compile for all dependencies
+# Ensure you replace 'polyglot_orchestrator' with the correct path to your main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/polyglot_orchestrator/main.go
 
 # Use the latest version of Alpine Linux for the final image
 FROM alpine:latest
@@ -30,6 +31,7 @@ RUN addgroup -S appgroup && adduser -S gouser -G appgroup
 WORKDIR /app
 
 # Copy the compiled binary from the builder stage into the current container
+# The binary is named 'main' as specified in the build step
 COPY --from=builder /app/main .
 
 # Switch to the user 'gouser' for security purposes (non-root user)

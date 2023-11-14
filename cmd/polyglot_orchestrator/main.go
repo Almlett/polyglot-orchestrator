@@ -1,18 +1,30 @@
 package main
 
 import (
-    "log"
-    "net/http"
-    "github.com/gorilla/mux"
-    "PolyglotOrchestrator/internal/api"
+	"PolyglotOrchestrator/config"
+	"fmt"
+
+	"PolyglotOrchestrator/internal/models"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
-    r := mux.NewRouter()
+	cfg := config.New()
+	dsn := cfg.GetDBURL()
 
-    // Routes consist of a path and a handler function.
-    r.HandleFunc("/", api.HomeHandler)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-    // Start server
-    log.Fatal(http.ListenAndServe(":8080", r))
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = db.AutoMigrate(&models.User{}, &models.Role{}, &models.Permission{}, &models.UserPermission{}, &models.UserRoles{}, &models.RolePermission{}, &models.Token{})
+	if err != nil {
+		fmt.Println("Error running migrations: ", err)
+		return
+	}
+
+	fmt.Println("Migration did run successfully")
 }
